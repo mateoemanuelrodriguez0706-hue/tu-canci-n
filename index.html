@@ -562,7 +562,7 @@ function escapeHtml(str) {
 }
 
 function buildSummaryText() {
-  let out = `Cuestionario de canción — ${answers.nombre || ''}\n\n`;
+  let out = `Brief de Producción Musical — ${answers.nombre || ''}\n\n`;
   answerable.forEach(aq => {
     if (aq.key === 'nombre') return;
     const val = answers[aq.key];
