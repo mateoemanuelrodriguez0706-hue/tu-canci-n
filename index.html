@@ -1,0 +1,597 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Cuestionario de tu canción</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Source+Sans+3:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #121212;
+    --ink-2: #1A1512;
+    --surface: #201A16;
+    --surface-2: #271F19;
+    --line: #3A3A3A;
+    --espresso: #4E342E;
+    --cacao: #6D4C41;
+    --gold: #C87A2A;
+    --gold-2: #D89C3D;
+    --gold-soft: rgba(200,122,42,0.18);
+    --text: #F2E6D8;
+    --text-muted: #B89A7A;
+    --text-faint: #8A6F55;
+    box-sizing: border-box;
+    padding-top: env(safe-area-inset-top, 0px);
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+  /* Fixed brand palette — same warm dark studio look regardless of system theme */
+  @media (prefers-color-scheme: light) {
+    :root:not([data-theme="dark"]) {
+      --ink: #121212;
+      --ink-2: #1A1512;
+      --surface: #201A16;
+      --surface-2: #271F19;
+      --line: #3A3A3A;
+      --gold: #C87A2A;
+      --gold-2: #D89C3D;
+      --gold-soft: rgba(200,122,42,0.18);
+      --text: #F2E6D8;
+      --text-muted: #B89A7A;
+      --text-faint: #8A6F55;
+    }
+  }
+  :root[data-theme="light"] {
+    --ink: #121212;
+    --ink-2: #1A1512;
+    --surface: #201A16;
+    --surface-2: #271F19;
+    --line: #3A3A3A;
+    --gold: #C87A2A;
+    --gold-2: #D89C3D;
+    --gold-soft: rgba(200,122,42,0.18);
+    --text: #F2E6D8;
+    --text-muted: #B89A7A;
+    --text-faint: #8A6F55;
+  }
+  * { box-sizing: border-box; }
+  html { scroll-padding-top: env(safe-area-inset-top, 0px); }
+  html, body {
+    height: 100%;
+    margin: 0;
+    background: var(--ink);
+    color: var(--text);
+    font-family: 'Source Sans 3', sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+  body {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-height: 100%;
+    background-image:
+      repeating-linear-gradient(180deg, transparent 0 39px, var(--line) 39px 40px);
+    background-size: 100% 40px;
+    background-position: 0 0;
+    -webkit-mask-image: linear-gradient(180deg, black 0%, black 85%, transparent 100%);
+    mask-image: linear-gradient(180deg, black 0%, black 85%, transparent 100%);
+  }
+  .wrap {
+    width: 100%;
+    max-width: 640px;
+    padding: 28px 20px 60px;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    min-height: 100%;
+  }
+
+  /* Header */
+  .top {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    margin-bottom: 6px;
+  }
+  .brand {
+    font-family: 'Fraunces', serif;
+    font-size: 15px;
+    letter-spacing: 0.02em;
+    color: var(--gold);
+  }
+  .step-count {
+    font-size: 13px;
+    color: var(--text-faint);
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* waveform progress */
+  .wave {
+    display: flex;
+    align-items: flex-end;
+    gap: 3px;
+    height: 22px;
+    margin: 14px 0 30px;
+  }
+  .wave span {
+    flex: 1;
+    background: var(--line);
+    border-radius: 2px;
+    transition: background 0.4s ease, height 0.4s ease;
+  }
+  .wave span.done { background: var(--gold); }
+  .wave span.current { background: var(--text); }
+
+  .stage {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+
+  .q-eyebrow {
+    font-size: 13px;
+    color: var(--text-faint);
+    margin-bottom: 10px;
+  }
+  h1.q {
+    font-family: 'Fraunces', serif;
+    font-weight: 500;
+    font-size: clamp(24px, 6vw, 32px);
+    line-height: 1.28;
+    margin: 0 0 8px;
+    max-width: 22ch;
+  }
+  .q-hint {
+    color: var(--text-muted);
+    font-size: 15px;
+    line-height: 1.5;
+    margin: 0 0 28px;
+    max-width: 46ch;
+  }
+
+  /* options */
+  .options {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 8px;
+  }
+  .opt {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 16px 18px;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-left: 3px solid var(--line);
+    border-radius: 4px;
+    cursor: pointer;
+    text-align: left;
+    font-family: inherit;
+    font-size: 16px;
+    color: var(--text);
+    transition: border-color 0.15s ease, background 0.15s ease;
+  }
+  .opt {
+    box-shadow: 0 1px 0 rgba(78,52,46,0.4);
+  }
+  .opt:hover { border-color: var(--gold-2); }
+  .opt .mark {
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    border: 1.5px solid var(--text-faint);
+    flex-shrink: 0;
+    transition: all 0.15s ease;
+  }
+  .opt.selected {
+    border-left-color: var(--gold);
+    border-color: var(--gold-2);
+    background: var(--gold-soft);
+  }
+  .opt.selected .mark {
+    background: var(--gold-2);
+    border-color: var(--gold-2);
+    box-shadow: 0 0 0 3px var(--gold-soft);
+  }
+
+  input[type=text], textarea {
+    width: 100%;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    padding: 16px 18px;
+    font-family: inherit;
+    font-size: 16px;
+    color: var(--text);
+    resize: vertical;
+    line-height: 1.5;
+  }
+  textarea { min-height: 110px; }
+  input[type=text]:focus, textarea:focus, .opt:focus-visible {
+    outline: 2px solid var(--gold);
+    outline-offset: 1px;
+  }
+  input::placeholder, textarea::placeholder { color: var(--text-faint); }
+  .optional-tag {
+    display: inline-block;
+    font-size: 12px;
+    color: var(--text-faint);
+    margin-left: 8px;
+  }
+
+  /* nav */
+  .nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 30px;
+    gap: 12px;
+  }
+  button {
+    font-family: inherit;
+    cursor: pointer;
+    border: none;
+  }
+  .btn-primary {
+    background: linear-gradient(180deg, var(--gold-2), var(--gold));
+    color: #1A1210;
+    font-size: 16px;
+    font-weight: 600;
+    padding: 14px 26px;
+    border-radius: 4px;
+    flex: 1;
+    box-shadow: 0 3px 0 var(--espresso);
+    transition: opacity 0.15s ease, transform 0.1s ease;
+  }
+  .btn-primary:disabled { opacity: 0.35; cursor: not-allowed; }
+  .btn-primary:not(:disabled):active { transform: scale(0.98); }
+  .btn-back {
+    background: transparent;
+    color: var(--text-muted);
+    font-size: 15px;
+    padding: 14px 6px;
+  }
+  .btn-back:disabled { visibility: hidden; }
+
+  /* intro / outro */
+  .center-stage { text-align: left; }
+  .icon-mark {
+    font-family: 'Fraunces', serif;
+    font-size: 13px;
+    color: var(--gold);
+    letter-spacing: 0.04em;
+    margin-bottom: 18px;
+  }
+  .lead {
+    color: var(--text-muted);
+    font-size: 16px;
+    line-height: 1.6;
+    max-width: 48ch;
+    margin: 0 0 30px;
+  }
+
+  /* summary */
+  .summary-list { display: flex; flex-direction: column; gap: 0; margin: 0 0 24px; }
+  .s-row {
+    padding: 14px 0;
+    border-bottom: 1px solid var(--line);
+  }
+  .s-row:first-child { padding-top: 0; }
+  .s-q { font-size: 13px; color: var(--text-faint); margin-bottom: 4px; }
+  .s-a { font-size: 16px; color: var(--text); font-family: 'Fraunces', serif; }
+  .s-a.empty { color: var(--text-faint); font-family: inherit; font-style: italic; font-size: 14px; }
+
+  .copy-box {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    padding: 16px 18px;
+    font-size: 14px;
+    color: var(--text-muted);
+    white-space: pre-wrap;
+    line-height: 1.6;
+    margin-bottom: 18px;
+    max-height: 260px;
+    overflow-y: auto;
+  }
+  .copy-status {
+    font-size: 14px;
+    color: var(--gold);
+    text-align: center;
+    height: 20px;
+    margin-top: 10px;
+  }
+
+  @media (min-width: 640px) {
+    .wrap { padding-top: 48px; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="top">
+    <div class="brand">Tu canción</div>
+    <div class="step-count" id="stepCount"></div>
+  </div>
+  <div class="wave" id="wave"></div>
+
+  <div class="stage" id="stage"></div>
+
+  <div class="nav" id="nav" style="display:none">
+    <button class="btn-back" id="backBtn">Atrás</button>
+    <button class="btn-primary" id="nextBtn">Continuar</button>
+  </div>
+</div>
+
+<script>
+const questions = [
+  {
+    key: "intro",
+    type: "intro"
+  },
+  {
+    key: "nombre",
+    type: "text",
+    eyebrow: "Empecemos",
+    title: "¿Cómo te llamás?",
+    placeholder: "Escribí tu nombre"
+  },
+  {
+    key: "letra",
+    type: "single",
+    eyebrow: "Sobre tu canción",
+    title: "¿La canción ya tiene letra?",
+    options: ["Sí, completa", "Sí, pero está incompleta", "Todavía no"]
+  },
+  {
+    key: "melodia",
+    type: "single",
+    eyebrow: "Sobre tu canción",
+    title: "¿Ya tenés una melodía para la canción?",
+    options: ["Sí, ya está definida", "Tengo una idea de la melodía", "Todavía no"]
+  },
+  {
+    key: "estado",
+    type: "single",
+    eyebrow: "Sobre tu canción",
+    title: "¿En qué estado está actualmente tu canción?",
+    options: ["Tengo letra + melodía", "Tengo letra pero no melodía", "Tengo una idea y quiero desarrollarla", "Estoy empezando desde cero"]
+  },
+  {
+    key: "estilo",
+    type: "text",
+    area: true,
+    eyebrow: "Sobre tu canción",
+    title: "¿Tenés pensado algún estilo o sonido para la canción?",
+    hint: "Por ejemplo: worship, adoración, pop, urbano, balada, gospel, etc.",
+    placeholder: "Contame el estilo que imaginás..."
+  },
+  {
+    key: "referencia",
+    type: "text",
+    area: true,
+    eyebrow: "Sobre tu canción",
+    title: "¿Hay algún artista o canción que te gustaría tomar como referencia de sonido?",
+    placeholder: "Nombrá artistas o canciones (opcional)",
+    optional: true
+  },
+  {
+    key: "experiencia",
+    type: "single",
+    eyebrow: "Sobre tu canción",
+    title: "¿Es tu primera vez trabajando en una producción musical?",
+    options: ["Sí, es mi primera vez", "Ya trabajé antes con algún productor"]
+  },
+  {
+    key: "objetivo",
+    type: "text",
+    area: true,
+    eyebrow: "Sobre tu canción",
+    title: "¿Qué te gustaría lograr con esta canción?",
+    hint: "Por ejemplo: lanzarla en plataformas, presentarla en tu iglesia, comenzar tu proyecto como artista, compartir un mensaje, etc.",
+    placeholder: "Contame tu objetivo..."
+  },
+  {
+    key: "outro",
+    type: "outro"
+  }
+];
+
+let current = 0;
+const answers = {};
+
+const stage = document.getElementById('stage');
+const nav = document.getElementById('nav');
+const backBtn = document.getElementById('backBtn');
+const nextBtn = document.getElementById('nextBtn');
+const stepCount = document.getElementById('stepCount');
+const waveEl = document.getElementById('wave');
+
+// build waveform bars (excluding intro/outro from count)
+const answerable = questions.filter(q => q.type !== 'intro' && q.type !== 'outro');
+answerable.forEach(() => {
+  const bar = document.createElement('span');
+  waveEl.appendChild(bar);
+});
+
+function heightFor(i, total) {
+  // gentle waveform silhouette
+  const mid = total / 2;
+  const dist = Math.abs(i - mid);
+  const h = 22 - (dist / mid) * 12;
+  return Math.max(8, h);
+}
+
+function renderWave() {
+  const bars = waveEl.children;
+  const answerIdx = answerable.findIndex(q => q.key === questions[current].key);
+  for (let i = 0; i < bars.length; i++) {
+    bars[i].style.height = heightFor(i, bars.length) + 'px';
+    bars[i].classList.remove('done', 'current');
+    if (questions[current].type === 'intro') continue;
+    if (questions[current].type === 'outro') { bars[i].classList.add('done'); continue; }
+    if (i < answerIdx) bars[i].classList.add('done');
+    else if (i === answerIdx) bars[i].classList.add('current');
+  }
+}
+
+function isAnswered(q) {
+  if (!q || q.type === 'intro' || q.type === 'outro') return true;
+  if (q.optional) return true;
+  const v = answers[q.key];
+  return v !== undefined && v !== null && String(v).trim() !== '';
+}
+
+function render() {
+  const q = questions[current];
+  stage.innerHTML = '';
+  nav.style.display = (q.type === 'intro' || q.type === 'outro') ? 'none' : 'flex';
+
+  if (q.type !== 'intro' && q.type !== 'outro') {
+    const idx = answerable.findIndex(x => x.key === q.key) + 1;
+    stepCount.textContent = idx + ' / ' + answerable.length;
+  } else {
+    stepCount.textContent = '';
+  }
+  renderWave();
+
+  if (q.type === 'intro') {
+    stage.innerHTML = `
+      <div class="center-stage">
+        <div class="icon-mark">♪ · · ·</div>
+        <h1 class="q">Contame sobre la canción que querés crear</h1>
+        <p class="lead">Unas pocas preguntas para entender tu idea, tu historia y hacia dónde querés llevar esta canción. Tomá el tiempo que necesites — podés responder punto por punto.</p>
+        <div class="nav" style="display:flex">
+          <button class="btn-back" disabled></button>
+          <button class="btn-primary" onclick="goNext()">Empezar</button>
+        </div>
+      </div>
+    `;
+    return;
+  }
+
+  if (q.type === 'outro') {
+    const rows = answerable.map(aq => {
+      const val = answers[aq.key];
+      const display = val && String(val).trim() !== '' ? val : null;
+      return `<div class="s-row">
+        <div class="s-q">${aq.title}</div>
+        <div class="s-a ${display ? '' : 'empty'}">${display ? escapeHtml(display) : 'Sin responder'}</div>
+      </div>`;
+    }).join('');
+
+    stage.innerHTML = `
+      <div class="center-stage">
+        <div class="icon-mark">♪ · · ·</div>
+        <h1 class="q">¡Listo, ${escapeHtml(answers.nombre || '')}!</h1>
+        <p class="lead">Este es el resumen de tu canción. Enviámelo por WhatsApp para que empecemos a trabajar juntos.</p>
+        <div class="summary-list">${rows}</div>
+        <button class="btn-primary" style="width:100%" onclick="sendWhatsapp()">Enviar por WhatsApp</button>
+        <button class="btn-back" style="width:100%; margin-top:10px;" onclick="copyAnswers()">Copiar respuestas</button>
+        <div class="copy-status" id="copyStatus"></div>
+      </div>
+    `;
+    return;
+  }
+
+  // question header
+  const header = document.createElement('div');
+  header.innerHTML = `
+    <div class="q-eyebrow">${q.eyebrow}</div>
+    <h1 class="q">${q.title}${q.optional ? '<span class="optional-tag">(opcional)</span>' : ''}</h1>
+    ${q.hint ? `<p class="q-hint">${q.hint}</p>` : ''}
+  `;
+  stage.appendChild(header);
+
+  if (q.type === 'single') {
+    const opts = document.createElement('div');
+    opts.className = 'options';
+    q.options.forEach(opt => {
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'opt' + (answers[q.key] === opt ? ' selected' : '');
+      btn.innerHTML = `<span class="mark"></span><span>${opt}</span>`;
+      btn.onclick = () => { answers[q.key] = opt; render(); };
+      opts.appendChild(btn);
+    });
+    stage.appendChild(opts);
+  } else if (q.type === 'text') {
+    const el = document.createElement(q.area ? 'textarea' : 'input');
+    if (!q.area) el.type = 'text';
+    el.placeholder = q.placeholder || '';
+    el.value = answers[q.key] || '';
+    el.oninput = () => { answers[q.key] = el.value; updateNextState(); };
+    stage.appendChild(el);
+    setTimeout(() => el.focus({ preventScroll: true }), 50);
+  }
+
+  updateNextState();
+  backBtn.disabled = false;
+}
+
+function updateNextState() {
+  const q = questions[current];
+  nextBtn.disabled = !isAnswered(q);
+}
+
+function goNext() {
+  if (current < questions.length - 1) {
+    current++;
+    render();
+    window.scrollTo({ top: 0 });
+  }
+}
+function goBack() {
+  if (current > 0) {
+    current--;
+    render();
+    window.scrollTo({ top: 0 });
+  }
+}
+
+nextBtn.addEventListener('click', goNext);
+backBtn.addEventListener('click', goBack);
+
+function escapeHtml(str) {
+  const d = document.createElement('div');
+  d.textContent = str;
+  return d.innerHTML;
+}
+
+function buildSummaryText() {
+  let out = `Cuestionario de canción — ${answers.nombre || ''}\n\n`;
+  answerable.forEach(aq => {
+    if (aq.key === 'nombre') return;
+    const val = answers[aq.key];
+    out += `${aq.title}\n${val && val.trim() !== '' ? val : '(sin responder)'}\n\n`;
+  });
+  return out.trim();
+}
+
+const WHATSAPP_NUMBER = "5493413459128";
+
+async function copyAnswers() {
+  const text = buildSummaryText();
+  const statusEl = document.getElementById('copyStatus');
+  try {
+    await navigator.clipboard.writeText(text);
+    statusEl.textContent = '✓ Copiado — ya podés pegarlo y enviarlo';
+  } catch (e) {
+    statusEl.textContent = 'No se pudo copiar automáticamente, seleccioná el texto manualmente';
+  }
+}
+
+function sendWhatsapp() {
+  const text = buildSummaryText();
+  const url = 'https://wa.me/' + WHATSAPP_NUMBER + '?text=' + encodeURIComponent(text);
+  window.open(url, '_blank');
+}
+
+render();
+</script>
+</body>
+</html>
